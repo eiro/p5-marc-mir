@@ -17,5 +17,8 @@ now {
 	"error ($@) at record $count"
     };
     unless ( $raw eq to_iso2709 $rec ) {
+	say for_humans $rec;
+	exit;
     }
-} iso2709_records_of shift
+} iso2709_records_of shift;
+say "$count record successfully passed";
