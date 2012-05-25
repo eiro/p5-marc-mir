@@ -2,11 +2,11 @@
 
 =head2 Warnings
 
-for the moment, everything is found in MARC::MIR namespace, this will change. Also t/* is empty for the moment (this is clearly the next step) the scripts that uses MARC::MIR are yet working.
+for the moment, everything is found in MARC::MIR namespace, this will change. Also t/* is empty (this is clearly the next step) the scripts that uses MARC::MIR are yet working.
 
 =head2 What is MARC::MIR
 
-I dealt with lot of MARC records in the past (mainly from/to iso2709 files) and was really borring by the existing libraries. A MARC record is a very simple structure. every library i saw missed this point by wrapping records into painfull libraries, this make the MARC manipulation anoying and slow. Perl is awesome for manipulate datastructures: i wanted those power and simplicity back!
+I dealt with lot of MARC records in the past (mainly from/to iso2709 files) and was really annoyed by the existing libraries. A MARC record is a very simple structure. every library i saw missed this point by wrapping records into painfull OO approach, this make the MARC manipulation anoying and slow. Perl is awesome for manipulate datastructures: i wanted those power and simplicity back!
 
 =head3 Simple datastructure
 
