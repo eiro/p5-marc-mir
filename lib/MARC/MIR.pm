@@ -2,6 +2,10 @@ package MARC::MIR;
 use Modern::Perl;
 use parent 'Exporter';
 
+# ABSTRACT: DSL to manipulate MARC Intermediate Representation 
+our $VERSION = '0.0';
+
+
 our @EXPORT_OK = qw<
     iso2709_records_of
     from_iso2709
