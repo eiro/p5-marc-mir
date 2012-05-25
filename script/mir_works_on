@@ -1,0 +1,21 @@
+#! /usr/bin/perl
+
+use Modern::Perl; 
+use autodie;
+use Perlude;
+use YAML ();
+use MARC::MIR qw< :all >;
+
+my $count=0;
+
+now {
+    $count++;
+    my $raw = $_;
+    my $rec = eval { from_iso2709 };
+    if ( $@ || !$rec ) {
+	die 
+	"error ($@) at record $count"
+    };
+    unless ( $raw eq to_iso2709 $rec ) {
+    }
+} iso2709_records_of shift
