@@ -241,8 +241,7 @@ sub is_control (_) {
 }
 
 sub record_id (_) {
-    my $rec = shift;
-    any_fields { tag eq '001' and value };
+    any_fields { tag eq '001' and value } shift;
 }
 
 1;
