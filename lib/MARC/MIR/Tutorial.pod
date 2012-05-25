@@ -21,7 +21,7 @@ A MIR control field is a tag and a value.
     [ '001', '1231313145' ]
 
 
-A MIR control field is a tag, a MIR subfield_collection and an optionnal MIR indicator. The MIR indicator is a 2 char string or a 2 elements array. so all those MIR field_collection are valid.
+A MIR data field is a tag, a MIR subfield_collection and an optionnal MIR indicator. The MIR indicator is a 2 char string or a 2 elements array. so all those MIR field_collection are valid.
 
     [ $tag, [@subfield] ]
     [ $tag, [@subfield], "  " ]
