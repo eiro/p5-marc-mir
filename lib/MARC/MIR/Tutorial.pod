@@ -34,9 +34,10 @@ This is an example of a complete MIR record:
     [ "Header" => 
 	[ [ '001' => '2344564564' ] # this is the ID
 	,   [ '856'
-	    , [ q => "jpeg" ]
-	    , [ z => "cover from original version" ] 
-	    , [ u => "http://localhost/img/" ] 
+	    , [ [ q => "jpeg" ]
+	      , [ z => "cover from original version" ] 
+	      , [ u => "http://localhost/img/" ] 
+	      ]
 	    ]
 	]
     ]
@@ -64,7 +65,7 @@ remove every 9.. fields
 
     now {
 	$_ = from_iso2709;
-	with_fields { @$_ = grep_fields { (tag) !~ /^9/ } @$_ };
+	with_fields { @$_ = grep { (tag) !~ /^9/ } @$_ };
 	print to_iso2709;
     } iso2709_records_of "biblio.marc";
 
