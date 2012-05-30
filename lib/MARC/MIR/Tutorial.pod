@@ -50,16 +50,19 @@ also, iso2709_records_of is an helper that stream the records of an ISO2709 form
 
 =head2 some examples 
 
-the perfect  boilerplate
+the perfect boilerplate
 
-    use Perlude;
     use autodie;
     use Modern::Perl;
-    use MARC::MIR qw< :all >;
+    use MARC::MIR;
 
 print all the ids of the records (assuming the id is in 001, the common case)
 
-    now { say record_id from_iso2709 } iso2709_records_of "biblio.marc";
+    now    { say record_id from_iso2709 } iso2709_records_of "biblio.marc";
+
+or
+
+    marawk { say $ID } "biblio.marc";
 
 remove every 9.. fields
 
@@ -74,12 +77,31 @@ every 856$q must be jpeg
     now {
 	$_ = from_iso2709;
 	map_fields {
-	    tag eq '856' and map_those_subfields {
+	    tag eq '856' and map_subfields {
 		(tag) eq 'z' and with_value { $_ = 'jpeg' }
 	    }
 	}
 	with_fields { @$_ = grep_fields { (tag) !~ /^9/ } @$_ };
-	print to_iso2709;
     } iso2709_records_of "biblio.marc";
+
+or 
+
+    marawk { map_values { $_ = 'jpeg' } [qw< 856 z >] } "biblio.marc"
+
+collect every 856$z by id
+
+    use Modern::Perl;
+    use YAML;
+    use MARC::MIR;
+
+    my %seen;
+    marawk {
+	map_values { push @{ $seen{$ID} }, $_ } [qw< 856 z >]
+    } "data/*.RAW";
+    say YAML::Dump \%seen;
+
+=head2 marawk
+
+
 
 

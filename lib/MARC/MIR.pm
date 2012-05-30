@@ -11,13 +11,13 @@ our $VERSION = '0.0';
 # our %EXPORT_TAGS =
 # ( dsl => [qw<
 # 	with_fields
-# 	with_those_subfields
+# 	with_subfields
 # 	map_fields
-# 	map_those_subfields
+# 	map_subfields
 # 	grep_fields
-# 	grep_those_subfields
+# 	grep_subfields
 # 	any_fields
-# 	any_those_subfields
+# 	any_subfields
 # 	map_values
 # 
 # 	tag
@@ -36,13 +36,13 @@ our $VERSION = '0.0';
 
 our @EXPORT = qw<
 	with_fields
-	with_those_subfields
+	with_subfields
 	map_fields
-	map_those_subfields
+	map_subfields
 	grep_fields
-	grep_those_subfields
+	grep_subfields
 	any_fields
-	any_those_subfields
+	any_subfields
 	map_values
 
 	tag
@@ -248,13 +248,13 @@ sub _grep_data {
 }
 
 sub with_fields              (&;$) { &_with_data  }
-sub with_those_subfields     (&;$) { &_with_data  }
+sub with_subfields     (&;$) { &_with_data  }
 sub map_fields               (&;$) { &_map_data   }
-sub map_those_subfields      (&;$) { &_map_data   }
+sub map_subfields      (&;$) { &_map_data   }
 sub grep_fields              (&;$) { &_grep_data  }
-sub grep_those_subfields     (&;$) { &_grep_data  }
+sub grep_subfields     (&;$) { &_grep_data  }
 sub any_fields               (&;$) { &_any_data   }
-sub any_those_subfields      (&;$) { &_any_data   }
+sub any_subfields      (&;$) { &_any_data   }
 
 sub with_value (&;$) {
     my $code = shift;
@@ -277,12 +277,12 @@ sub map_values (&$;$) {
     my $rec  = @_ ? shift : $_;
     map {
 	map { with_value {$code->()} }
-	    grep_those_subfields { (tag) ~~ $sspec }
+	    grep_subfields { (tag) ~~ $sspec }
     } grep_fields { (tag) ~~ $fspec }
     # TODO: Benchmark: is it really faster ? 
     # map_fields {
     #     if ( (tag) ~~ $fspec ) {
-    #         map_those_subfields {
+    #         map_subfields {
     #     	if ( (tag) ~~ $sspec ) {
     #     	    with_value { $code->() }
     #     	} else { () }
