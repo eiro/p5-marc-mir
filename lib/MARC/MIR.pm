@@ -18,6 +18,7 @@ our $VERSION = '0.0';
 # 	grep_those_subfields
 # 	any_fields
 # 	any_those_subfields
+# 	map_values
 # 
 # 	tag
 # 	value
@@ -42,6 +43,7 @@ our @EXPORT = qw<
 	grep_those_subfields
 	any_fields
 	any_those_subfields
+	map_values
 
 	tag
 	value
@@ -268,6 +270,27 @@ sub is_control (_) {
 sub record_id (_) {
     any_fields { tag eq '001' and value } shift;
 }
+
+sub map_values (&$;$) {
+    my $code = shift or die;
+    my ( $fspec, $sspec ) = map { @$_ } (shift or die);
+    my $rec  = @_ ? shift : $_;
+    map {
+	map { with_value {$code->()} }
+	    grep_those_subfields { (tag) ~~ $sspec }
+    } grep_fields { (tag) ~~ $fspec }
+    # TODO: Benchmark: is it really faster ? 
+    # map_fields {
+    #     if ( (tag) ~~ $fspec ) {
+    #         map_those_subfields {
+    #     	if ( (tag) ~~ $sspec ) {
+    #     	    with_value { $code->() }
+    #     	} else { () }
+    #         }
+    #     } else { () }
+    # } $rec
+}
+
 
 sub marawk (&$) {
     my ( $code, $glob ) = @_;
