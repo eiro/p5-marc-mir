@@ -1,38 +1,63 @@
 package MARC::MIR;
-use Modern::Perl;
 use parent 'Exporter';
+use Modern::Perl;
+use Perlude;
+use Perlude::Sh qw< :all >;
+
 
 # ABSTRACT: DSL to manipulate MARC Intermediate Representation 
 our $VERSION = '0.0';
 
+# our %EXPORT_TAGS =
+# ( dsl => [qw<
+# 	with_fields
+# 	with_those_subfields
+# 	map_fields
+# 	map_those_subfields
+# 	grep_fields
+# 	grep_those_subfields
+# 	any_fields
+# 	any_those_subfields
+# 
+# 	tag
+# 	value
+# 
+# 	with_value
+# 	is_control
+# 	record_id
+# 
+# 	for_humans
+#     >]
+# , debug   => [qw< ready_to_see >]
+# , iso2709 => [qw< from_iso2709 to_iso2709 iso2709_records_of >]
+# , marawk  => [qw< marawk $NUM $RAW $REC $ID %FIELDS >]
+# , all => [qw<
 
-our @EXPORT_OK = qw<
-    iso2709_records_of
-    from_iso2709
-    to_iso2709
-    for_humans
+our @EXPORT = qw<
+	with_fields
+	with_those_subfields
+	map_fields
+	map_those_subfields
+	grep_fields
+	grep_those_subfields
+	any_fields
+	any_those_subfields
 
-    with_fields
-    with_those_subfields
-    map_fields
-    map_those_subfields
-    grep_fields
-    grep_those_subfields
-    any_fields
-    any_those_subfields
+	tag
+	value
 
-    tag
-    value
+	with_value
+	is_control
+	record_id
 
-    with_value
-    is_control
-    record_id
-    ready_to_see
+	for_humans
+	ready_to_see
+	from_iso2709 to_iso2709 iso2709_records_of
+	marawk $NUM $RAW $REC $ID %FIELDS
+    >;
+# );
+# our @EXPORT_OK = $EXPORT_TAGS{all} = [map @$_, values %EXPORT_TAGS];
 
->;
-
-
-our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 our $RS = "\x1d";
 our $FS = "\x1e";
 our $SS = "\x1f";
@@ -244,5 +269,24 @@ sub record_id (_) {
     any_fields { tag eq '001' and value } shift;
 }
 
+sub marawk (&$) {
+    my ( $code, $glob ) = @_;
+    our ( $NUM, $RAW, $REC, $ID, %FIELDS )
+    =   ( 0 );
+    now {
+	$NUM++;
+	$RAW = $_;
+	$_ = $REC = from_iso2709 $_;
+	$ID  = record_id or die "no ID inthere :". for_humans;
+	%FIELDS=();
+
+	map_fields {
+	    push @{ $FIELDS{(tag)} }
+	    , $_
+	};
+
+	$code->();
+    } concatM {iso2709_records_of} ls $glob
+}
 1;
 
