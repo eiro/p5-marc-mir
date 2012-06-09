@@ -3,12 +3,17 @@ use parent 'Exporter';
 use Modern::Perl;
 use Perlude;
 use Perlude::Sh qw< :all >;
+# ABSTRACT: DSL to manipulate MIR records.
 
 =head1 MIR: MARC Intermediate Representation
 
-ABSTRACT: DSL to manipulate MIR records.
+This is a early adoption code coming with
 
-This is a early adoption code. perldoc MARC::MIR::tutorial for more information
+    * DSL to manipulate MIR records
+    * ISO2709 parser
+    * ISO2709 writer
+
+perldoc MARC::MIR::tutorial for more information
 
     * the interface may change
     * t/ is empty, so use it at your own risk
