@@ -4,8 +4,19 @@ use Modern::Perl;
 use Perlude;
 use Perlude::Sh qw< :all >;
 
+=head1 MIR: MARC Intermediate Representation
 
-# ABSTRACT: DSL to manipulate MARC Intermediate Representation 
+ABSTRACT: DSL to manipulate MIR records.
+
+This is a early adoption code. perldoc MARC::MIR::tutorial for more information
+
+    * the interface may change
+    * t/ is empty, so use it at your own risk
+
+anyway: the MIR itself will not change. 
+
+=cut
+
 our $VERSION = '0.0';
 
 # our %EXPORT_TAGS =
