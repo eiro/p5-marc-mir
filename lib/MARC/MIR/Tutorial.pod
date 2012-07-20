@@ -54,6 +54,7 @@ the perfect boilerplate
 
     use autodie;
     use Modern::Perl;
+    use Perlude;
     use MARC::MIR;
 
 print all the ids of the records (assuming the id is in 001, the common case)
