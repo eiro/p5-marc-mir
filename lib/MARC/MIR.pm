@@ -1,5 +1,6 @@
 package MARC::MIR;
 use parent 'Exporter';
+use autodie;
 use Modern::Perl;
 use Perlude;
 use Perlude::Sh qw< :all >;
@@ -100,8 +101,10 @@ sub _fold_indicators {
 
 sub to_iso2709 (_) {
     # adapted from Frederic Demian's MARC::Moose serializer
+    state $empty_header = 'x'x24;
 
     my $rec = shift;
+    for ( $$rec[0] ) { length or $_ = $empty_header }
     my (@directory,@data);
     my $from = 0;
 
@@ -127,7 +130,8 @@ sub to_iso2709 (_) {
 	};
 	$last and push @{ $$field[1] }, $last;
 
-	my $len = bytes::length( $raw );
+	# my $len = bytes::length( $raw );
+	my $len = length( $raw );
 	push @data, $raw;
 	push @directory
 	, sprintf( "%03s%04d%05d", $$field[0], $len, $from );
@@ -146,8 +150,21 @@ sub to_iso2709 (_) {
 	# Default leader various pseudo variable fields
 	# Force UNICODE MARC21: substr($$rec[0], 9, 1) = 'a';
 	# those are defaults described at http://archive.ifla.org/VI/3/p1996-1/uni.htm
-	substr($_, 10, 2) = '22';
-	substr($_, 20, 4) = '4500';
+        # xxxxnAxxxxxxxxxxxxxxxx 
+        # A:
+        # a printed language
+        # b manuscript language 
+        # c printed scores
+        # d manuscript scores 
+        # e printed carto
+        # f manuscript carto
+        # g video
+        # i sound
+        # j music
+        # k tron
+        # m multimedia
+        # r 3D
+
     }
 
     join ''
@@ -231,13 +248,15 @@ sub _with_data {
     map { $code->() } $$on[1];
 }
 
+sub _one_or_array {
+    my $r = shift;
+    (ref $r) ? @$r : $r
+}
+
 sub _map_data {
     &_use_arg;
     my  ( $code, $on ) = @_;
-    map { $code->() } 
-	ref  $$on[1]
-	? @{ $$on[1] }
-	:    $$on[1]
+    map { $code->() } _one_or_array $$on[1]
 }
 
 sub _any_data {
@@ -246,30 +265,22 @@ sub _any_data {
     map {
 	my $r = $code->();
 	$r and return $r;
-    } 
-	ref  $$on[1]
-	? @{ $$on[1] }
-	:    $$on[1]
-    ;
-    ()
+    } _one_or_array $$on[1] 
 };
 
 sub _grep_data {
     &_use_arg;
     my  ( $code, $on ) = @_;
-    grep { $code->() } 
-	ref  $$on[1]
-	? @{ $$on[1] }
-	:    $$on[1]
+    grep { $code->() } _one_or_array $$on[1]
 }
 
-sub with_fields              (&;$) { &_with_data  }
+sub with_fields        (&;$) { &_with_data  }
 sub with_subfields     (&;$) { &_with_data  }
-sub map_fields               (&;$) { &_map_data   }
+sub map_fields         (&;$) { &_map_data   }
 sub map_subfields      (&;$) { &_map_data   }
-sub grep_fields              (&;$) { &_grep_data  }
+sub grep_fields        (&;$) { &_grep_data  }
 sub grep_subfields     (&;$) { &_grep_data  }
-sub any_fields               (&;$) { &_any_data   }
+sub any_fields         (&;$) { &_any_data   }
 sub any_subfields      (&;$) { &_any_data   }
 
 sub with_value (&;$) {

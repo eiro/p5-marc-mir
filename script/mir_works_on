@@ -1,10 +1,10 @@
 #! /usr/bin/perl
-
 use Modern::Perl; 
 use autodie;
 use Perlude;
 use YAML ();
-use MARC::MIR qw< :all >;
+use MARC::MIR;
+use IO::All;
 
 my $count=0;
 
@@ -16,8 +16,11 @@ now {
 	die 
 	"error ($@) at record $count"
     };
-    unless ( $raw eq to_iso2709 $rec ) {
-	say for_humans $rec;
+    my $newraw = to_iso2709 $rec;
+    unless ( $raw eq $newraw ) {
+        io('OLD') < keys %ENV;
+        # io('OLD') < $raw;
+        io('NEW') < $newraw;
 	exit;
     }
 } iso2709_records_of shift;
