@@ -19,7 +19,12 @@ perldoc MARC::MIR::tutorial for more information
     * the interface may change
     * t/ is empty, so use it at your own risk
 
-anyway: the MIR itself will not change. 
+anyway: the MIR itself will not change. Everything else is but still usable and so much easy to use that former libs.
+
+
+=head1 Contribute ? 
+
+    https://github.com/eiro/p5-marc-mir
 
 =cut
 
