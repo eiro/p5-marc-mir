@@ -358,6 +358,37 @@ sub marawk (&$) {
     } concatM {iso2709_records_of} ls $glob
 }
 
+sub cib_parser {
+    my $cib = shift;
+    my $last = @$cib;
+    my ( @fmt, @fields );
+    for ( my $i = 0; $last > $i; ) {
+        push @fmt   , "A$$cib[$i++]";
+        push @fields, $$cib[$i++];
+    }
+    my $fmt = join '',@fmt;
+    sub {
+        my %cib;
+        @cib{ @fields } = unpack $fmt, shift;
+        \%cib
+    }
+}
+
+our $gdp_parser = cib_parser [qw[
+    8 entered
+    1 date_type
+    4 pub 
+    4 pub2
+    3 audience
+    1 gov
+    1 modif
+    3 lang
+    1 transliteration
+    4 charset
+    4 charset2
+    2 title ]];
+
+
 sub yaz_marcdump {
     # example: yaz_marcdump "-i marc -o marc -f iso-5426 -t utf8 TR167R2344A001.RAW"
     open my $fh, '-|', "yaz-marcdump @_";
