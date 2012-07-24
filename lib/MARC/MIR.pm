@@ -357,5 +357,15 @@ sub marawk (&$) {
 	$code->();
     } concatM {iso2709_records_of} ls $glob
 }
+
+sub yaz_marcdump {
+    # example: yaz_marcdump "-i marc -o marc -f iso-5426 -t utf8 TR167R2344A001.RAW"
+    open my $fh, '-|', "yaz-marcdump @_";
+    sub {
+        local $/ = $MARC::MIR::RS;
+        <$fh> // ()
+    }
+}
+
 1;
 
