@@ -67,6 +67,11 @@ our @EXPORT = qw<
 	any_subfields
 	map_values
 
+with_datafields 
+map_datafields 
+grep_datafields 
+any_datafields 
+
 	tag
 	value
 
@@ -242,20 +247,24 @@ sub for_humans (_) {
 }
 
 
+sub is_control (_) {
+    my $r = shift;
+    @$r == 2;
+}
 sub tag   (_) { @{ shift() }[0] }
 sub value (_) { @{ shift() }[1] }
 
 sub _use_arg   { push @_, $_ unless @_ > 1 }
+sub _one_or_array {
+    my $r = shift;
+    (ref $r) ? @$r : $r
+}
+
 
 sub _with_data {
     &_use_arg;
     my ( $code, $on ) = @_;
     map { $code->() } $$on[1];
-}
-
-sub _one_or_array {
-    my $r = shift;
-    (ref $r) ? @$r : $r
 }
 
 sub _map_data {
@@ -288,15 +297,20 @@ sub grep_subfields     (&;$) { &_grep_data  }
 sub any_fields         (&;$) { &_any_data   }
 sub any_subfields      (&;$) { &_any_data   }
 
+sub datafields_only {
+    my $r = $_[0];
+    $_[0] = sub { (is_control) ? () : $r->() };
+}
+
+sub map_datafields   (&;$) { &datafields_only; &_map_data   }
+sub with_datafields  (&;$) { &datafields_only; &_with_data  }
+sub grep_datafields  (&;$) { &datafields_only; &_grep_data  }
+sub any_datafields   (&;$) { &datafields_only; &_any_data   }
+
 sub with_value (&;$) {
     my $code = shift;
     my $r    = @_ ? shift : $_;
     ( map $code->(), $$r[1] )[0];
-}
-
-sub is_control (_) {
-    my $r = shift;
-    @$r == 2;
 }
 
 sub record_id (_) {
