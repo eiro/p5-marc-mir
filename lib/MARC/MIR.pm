@@ -8,6 +8,8 @@ use Perlude::Sh qw< :all >;
 
 =head1 MIR: MARC Intermediate Representation
 
+# BUG: with_fields needs $_
+
 This is a early adoption code coming with
 
     * DSL to manipulate MIR records
@@ -28,7 +30,7 @@ anyway: the MIR itself will not change. Everything else is but still usable and 
 
 =cut
 
-our $VERSION = '0.0';
+our $VERSION = '0.2';
 
 # our %EXPORT_TAGS =
 # ( dsl => [qw<
@@ -83,6 +85,12 @@ any_datafields
 	ready_to_see
 	from_iso2709 to_iso2709 iso2709_records_of
 	marawk $NUM $RAW $REC $ID %FIELDS
+
+        yaz_marcdump
+
+        record_charset
+
+        cib_handlers cib_keys cib_reader cib_writer
     >;
 # );
 # our @EXPORT_OK = $EXPORT_TAGS{all} = [map @$_, values %EXPORT_TAGS];
@@ -92,7 +100,9 @@ our $FS = "\x1e";
 our $SS = "\x1f";
 
 sub iso2709_records_of (_) {
-    open my $fh, shift;
+    my $fh;
+    if ( ref $_[0] ) { $fh = shift }
+    else { open $fh, shift or die $! }
     sub {
 	local $/ = $RS;
 	<$fh> // ();
@@ -187,24 +197,21 @@ sub to_iso2709 (_) {
 
 
 sub _field {
-    my ( $tag ) = @_;
     my @chunks = split /\x1f(.)/;
-    if ( @chunks == 1 ) { [ $tag, @chunks ] }
-    else {
-	my @subfields;
-	my $indicators = [split //, shift @chunks];
-	while (@chunks) {
-	    push @subfields, [splice @chunks,0,2];
-	}
-	[ $tag, \@subfields, $indicators ]
+    return @chunks if @chunks == 1;
+    my @subfields;
+    my $indicators = [split //, shift @chunks];
+    while (@chunks) {
+        push @subfields, [splice @chunks,0,2];
     }
+    \@subfields, $indicators;
 }
 
 sub from_iso2709 (_) {
     my $raw = shift;
     chop $raw;
     my ( $head, @fields ) = split /\x1e/, $raw;
-    @fields or die;
+    @fields or die "raw $raw";
     $head =~ /(.{24})/cg or die;
     my $leader = $1;
     my @tags = $head =~ /\G(\d{3})\d{9}/cg;
@@ -212,7 +219,7 @@ sub from_iso2709 (_) {
 	die "head tailing ".( $head =~ /(.*)/cg );
     }
     [ $leader
-    , [ map {_field( shift @tags )} @fields ]
+    , [ map [ shift(@tags), _field ], @fields ]
     ];
 }
 
@@ -318,8 +325,8 @@ sub record_id (_) {
 }
 
 sub map_values (&$;$) {
-    my $code = shift or die;
-    my ( $fspec, $sspec ) = map { @$_ } (shift or die);
+    my $code = shift;
+    my ( $fspec, $sspec ) = map { @$_ } shift;
     my $rec  = @_ ? shift : $_;
     map {
 	map { with_value {$code->()} }
@@ -337,9 +344,14 @@ sub map_values (&$;$) {
     # } $rec
 }
 
-
 sub marawk (&$) {
-    my ( $code, $glob ) = @_;
+    my $code = shift;
+    my ($stream) = map {
+        ref $_
+        ? $_
+        : concatM {iso2709_records_of} ls $_
+    } $_[0];
+
     our ( $NUM, $RAW, $REC, $ID, %FIELDS )
     =   ( 0 );
     now {
@@ -353,12 +365,32 @@ sub marawk (&$) {
 	    push @{ $FIELDS{(tag)} }
 	    , $_
 	};
-
 	$code->();
-    } concatM {iso2709_records_of} ls $glob
+    } $stream
 }
 
-sub cib_parser {
+sub cib_reader {
+    my $fmt    = shift;
+    my @fields = map @$_, shift;
+
+    sub {
+        my %cib;
+        @cib{ @fields } = unpack $fmt, shift;
+        \%cib
+    }
+
+}
+
+sub cib_writer {
+    my $fmt    = shift;
+    my @fields = map @$_, shift;
+    sub {
+        my $cib = shift;
+        pack $fmt, @$cib{@fields};
+    }
+}
+
+sub cib_keys {
     my $cib = shift;
     my $last = @$cib;
     my ( @fmt, @fields );
@@ -366,28 +398,42 @@ sub cib_parser {
         push @fmt   , "A$$cib[$i++]";
         push @fields, $$cib[$i++];
     }
-    my $fmt = join '',@fmt;
-    sub {
-        my %cib;
-        @cib{ @fields } = unpack $fmt, shift;
-        \%cib
-    }
+
+    ( (join '',@fmt)
+    , \@fields
+    );
+
 }
 
-our $gdp_parser = cib_parser [qw[
-    8 entered
-    1 date_type
-    4 pub 
-    4 pub2
-    3 audience
-    1 gov
-    1 modif
-    3 lang
-    1 transliteration
-    4 charset
-    4 charset2
-    2 title ]];
+sub cib_handlers {
+    my @spec = cib_keys shift;
+    ( cib_reader ( @spec )
+    , cib_writer ( @spec )
+    );
+}
 
+our ($gdp_reader,$gpd_writer) = cib_handlers
+    [qw[
+        8 entered
+        1 date_type
+        4 pub 
+        4 pub2
+        3 audience
+        1 gov
+        1 modif
+        3 lang
+        1 transliteration
+        4 charset
+        4 charset2
+        2 title ]];
+
+sub record_charset (_) {
+    my $rec = shift;
+    ''. ( map_values
+        {$MARC::MIR::gdp_parser->( $_ )->{charset}}
+        [qw< 100 a >], $rec
+    )[0]
+}
 
 sub yaz_marcdump {
     # example: yaz_marcdump "-i marc -o marc -f iso-5426 -t utf8 TR167R2344A001.RAW"
@@ -399,4 +445,3 @@ sub yaz_marcdump {
 }
 
 1;
-

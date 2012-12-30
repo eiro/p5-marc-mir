@@ -1,5 +1,4 @@
 #! /usr/bin/perl
-use Modern::Perl;
 use YAML;
 use MARC::MIR;
 use Test::More tests => 2;
