@@ -295,8 +295,8 @@ sub _grep_data {
     grep { $code->() } _one_or_array $$on[1]
 }
 
-sub with_fields        (&;$) { &_with_data  }
-sub with_subfields     (&;$) { &_with_data  }
+sub with_fields        (&;$) { $_[1] ||= $_; &_with_data  }
+sub with_subfields     (&;$) { $_[1] ||= $_; &_with_data  }
 sub map_fields         (&;$) { &_map_data   }
 sub map_subfields      (&;$) { &_map_data   }
 sub grep_fields        (&;$) { &_grep_data  }
