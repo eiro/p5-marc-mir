@@ -1,47 +1,5 @@
 =head1 Tutorial for MARC::MIR DSL
 
-=head2 Warnings
-
-for the moment, everything is found in MARC::MIR namespace, this will change. Also t/* is empty (this is clearly the next step) the scripts that uses MARC::MIR are yet working.
-
-=head2 What is MARC::MIR
-
-I dealt with lot of MARC records in the past (mainly from/to iso2709 files) and was really annoyed by the existing libraries. A MARC record is a very simple structure. every library i saw missed this point by wrapping records into painfull OO approach, this make the MARC manipulation anoying and slow. Perl is awesome for manipulate datastructures: i wanted those power and simplicity back!
-
-=head3 Simple datastructure
-
-A MIR record is an array containing a leader and the MIR field_collection
-
-    [ $leader, [@fields] ]
-
-A MIR field_collection is a collection of either data field or control field.
-
-A MIR control field is a tag and a value.
-
-    [ '001', '1231313145' ]
-
-
-A MIR data field is a tag, a MIR subfield_collection and an optionnal MIR indicator. The MIR indicator is a 2 char string or a 2 elements array. so all those MIR field_collection are valid.
-
-    [ $tag, [@subfield] ]
-    [ $tag, [@subfield], "  " ]
-    [ $tag, [@subfield], [' ',' '] ]
-
-a MIR subfield_collection is a list of pairs tag/value.
-
-This is an example of a complete MIR record:
-
-    [ "Header" => 
-	[ [ '001' => '2344564564' ] # this is the ID
-	,   [ '856'
-	    , [ [ q => "jpeg" ]
-	      , [ z => "cover from original version" ] 
-	      , [ u => "http://localhost/img/" ] 
-	      ]
-	    ]
-	]
-    ]
-
 =head2 the DSL
 
 to make things more readable and less error prone, we also add a DSL. Every keywords of this DSL works the same way. FIXME : explain. 
@@ -103,6 +61,5 @@ collect every 856$z by id
 
 =head2 marawk
 
-
-
+# TODO:
 

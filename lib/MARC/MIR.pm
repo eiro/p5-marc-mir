@@ -4,34 +4,8 @@ use autodie;
 use Modern::Perl;
 use Perlude;
 use Perlude::Sh qw< :all >;
+
 # ABSTRACT: DSL to manipulate MIR records.
-
-=head1 MIR: MARC Intermediate Representation
-
-# BUG: with_fields needs $_
-
-This is a early adoption code coming with
-
-    * DSL to manipulate MIR records
-    * ISO2709 parser
-    * ISO2709 writer
-
-perldoc MARC::MIR::Tutorial for more information
-
-    * the interface may change
-    * t/ is empty, so use it at your own risk
-
-anyway: the MIR itself will not change. Everything else is but still usable and so much easy to use that former libs.
-
-see also the MARC::MIR::Template module for import/export from xml, json and so on.
-
-
-=head1 Contribute ? 
-
-    https://github.com/eiro/p5-marc-mir
-
-=cut
-
 our $VERSION = '0.2';
 
 # our %EXPORT_TAGS =
@@ -316,7 +290,7 @@ sub datafields_only {
 }
 
 sub map_datafields   (&;$) { &datafields_only; &_map_data   }
-sub with_datafields  (&;$) { &datafields_only; &_with_data  }
+# sub with_datafields  (&;$) { &datafields_only; &_with_data  }
 sub grep_datafields  (&;$) { &datafields_only; &_grep_data  }
 sub any_datafields   (&;$) { &datafields_only; &_any_data   }
 
