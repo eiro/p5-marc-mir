@@ -6,7 +6,7 @@ use Perlude;
 use Perlude::Sh qw< :all >;
 
 # ABSTRACT: DSL to manipulate MIR records.
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 # our %EXPORT_TAGS =
 # ( dsl => [qw<
