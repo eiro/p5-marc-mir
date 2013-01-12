@@ -95,6 +95,8 @@ any_datafields
         record_charset
 
         cib_handlers cib_keys cib_reader cib_writer
+
+        indicators
     >;
 # );
 # our @EXPORT_OK = $EXPORT_TAGS{all} = [map @$_, values %EXPORT_TAGS];
@@ -446,5 +448,6 @@ sub append_subfields_to {
     ,    @{ $$_[1] };
 }
 
+sub indicators { $$_[2] }
 
 1;
