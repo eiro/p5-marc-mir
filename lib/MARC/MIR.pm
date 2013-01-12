@@ -16,12 +16,14 @@ This is a early adoption code coming with
     * ISO2709 parser
     * ISO2709 writer
 
-perldoc MARC::MIR::tutorial for more information
+perldoc MARC::MIR::Tutorial for more information
 
     * the interface may change
     * t/ is empty, so use it at your own risk
 
 anyway: the MIR itself will not change. Everything else is but still usable and so much easy to use that former libs.
+
+see also the MARC::MIR::Template module for import/export from xml, json and so on.
 
 
 =head1 Contribute ? 
