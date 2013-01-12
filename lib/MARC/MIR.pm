@@ -439,15 +439,6 @@ sub record_charset (_) {
     )[0]
 }
 
-sub yaz_marcdump {
-    # example: yaz_marcdump "-i marc -o marc -f iso-5426 -t utf8 TR167R2344A001.RAW"
-    open my $fh, '-|', "yaz-marcdump @_";
-    sub {
-        local $/ = $MARC::MIR::RS;
-        <$fh> // ()
-    }
-}
-
 sub append_subfields_to {
     my ($dest,@data) = @_;
     @data or @data = @{$$_[1]};
