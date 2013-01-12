@@ -76,6 +76,8 @@ map_datafields
 grep_datafields 
 any_datafields 
 
+    append_subfields_to
+
 	tag
 	value
 
@@ -445,5 +447,13 @@ sub yaz_marcdump {
         <$fh> // ()
     }
 }
+
+sub append_subfields_to {
+    my ($dest,@data) = @_;
+    @data or @data = @{$$_[1]};
+    push @{ $$dest[1] }
+    ,    @{ $$_[1] };
+}
+
 
 1;
