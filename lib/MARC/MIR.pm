@@ -3,10 +3,10 @@ use parent 'Exporter';
 use autodie;
 use Modern::Perl;
 use Perlude;
-use Perlude::Sh qw< :all >;
+# use Perlude::Sh qw< :all >;
 
 # ABSTRACT: DSL to manipulate MIR records.
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 # our %EXPORT_TAGS =
 # ( dsl => [qw<
