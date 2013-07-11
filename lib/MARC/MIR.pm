@@ -8,73 +8,37 @@ use Perlude;
 # ABSTRACT: DSL to manipulate MIR records.
 our $VERSION = '0.4';
 
-# our %EXPORT_TAGS =
-# ( dsl => [qw<
-# 	with_fields
-# 	with_subfields
-# 	map_fields
-# 	map_subfields
-# 	grep_fields
-# 	grep_subfields
-# 	any_fields
-# 	any_subfields
-# 	map_values
-# 
-# 	tag
-# 	value
-# 
-# 	with_value
-# 	is_control
-# 	record_id
-# 
-# 	for_humans
-#     >]
-# , debug   => [qw< ready_to_see >]
-# , iso2709 => [qw< from_iso2709 to_iso2709 iso2709_records_of >]
-# , marawk  => [qw< marawk $NUM $RAW $REC $ID %FIELDS >]
-# , all => [qw<
-
 our @EXPORT = qw<
-	with_fields
-	with_subfields
-	map_fields
-	map_subfields
-	grep_fields
-	grep_subfields
-	any_fields
-	any_subfields
 
-	map_values
-	any_values
 
-with_datafields 
-map_datafields 
-grep_datafields 
-any_datafields 
+    any_fields
+    any_subfields
+    grep_fields
+    grep_subfields
+    map_fields
+    map_subfields
+    map_values
+    with_fields
+    with_subfields
+
+    any_datafields 
+    grep_datafields 
+    map_datafields 
+    with_datafields 
+    with_value
 
     append_subfields_to
+    tag value is_control record_id
 
-	tag
-	value
+    for_humans
+    from_iso2709 to_iso2709 iso2709_records_of iso2709_cat
+    marawk $NUM $RAW $REC $ID %FIELDS
 
-	with_value
-	is_control
-	record_id
+    cib_handlers cib_keys cib_reader cib_writer
+    record_charset
 
-	for_humans
-	ready_to_see
-	from_iso2709 to_iso2709 iso2709_records_of
-	marawk $NUM $RAW $REC $ID %FIELDS
-
-        yaz_marcdump
-
-        record_charset
-
-        cib_handlers cib_keys cib_reader cib_writer
-
-        indicators
-
-        merge_fields
+    indicators
+    ready_to_see
     >;
 # );
 # our @EXPORT_OK = $EXPORT_TAGS{all} = [map @$_, values %EXPORT_TAGS];
@@ -181,7 +145,7 @@ sub to_iso2709 (_) {
 
 
 sub _field {
-    my @chunks = split /\x1f(.)/;
+    my @chunks = split /$SS(.)/;
     return @chunks if @chunks == 1;
     my @subfields;
     my $indicators = [split //, shift @chunks];
@@ -194,7 +158,7 @@ sub _field {
 sub from_iso2709 (_) {
     my $raw = shift;
     chop $raw;
-    my ( $head, @fields ) = split /\x1e/, $raw;
+    my ( $head, @fields ) = split $FS, $raw;
     @fields or die "raw $raw";
     $head =~ /(.{24})/cg or die;
     my $leader = $1;
@@ -327,6 +291,8 @@ sub map_values (&$;$) {
     #     } else { () }
     # } $rec
 }
+
+sub iso2709_cat { concatM {iso2709_records_of} shift }
 
 sub any_values (&$;$) {
     my $code = shift;
