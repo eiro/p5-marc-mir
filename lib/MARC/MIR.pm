@@ -43,7 +43,9 @@ our @EXPORT = qw<
 	grep_subfields
 	any_fields
 	any_subfields
+
 	map_values
+	any_values
 
 with_datafields 
 map_datafields 
@@ -71,6 +73,8 @@ any_datafields
         cib_handlers cib_keys cib_reader cib_writer
 
         indicators
+
+        merge_fields
     >;
 # );
 # our @EXPORT_OK = $EXPORT_TAGS{all} = [map @$_, values %EXPORT_TAGS];
@@ -324,6 +328,19 @@ sub map_values (&$;$) {
     # } $rec
 }
 
+sub any_values (&$;$) {
+    my $code = shift;
+    my ( $fspec, $sspec ) = map { @$_ } shift;
+    my $rec  = @_ ? shift : $_;
+    any_fields {
+        if ( (tag) ~~ $fspec ) {
+            any_subfields {
+                if ( (tag) ~~ $sspec ) { with_value { $code->() } }
+            }
+        }
+    } $rec;
+}
+
 sub marawk (&$) {
     my $code = shift;
     my ($stream) = map {
@@ -423,5 +440,20 @@ sub append_subfields_to {
 }
 
 sub indicators { $$_[2] }
+
+sub merge_fields {
+    my $tag    = shift or die;
+    my $fields = @_ ? $_[0][1] : $_->[1];
+    my $first;
+    @$fields = map {
+        if ( tag eq $tag ) {
+            if ( $first ) {
+                append_subfields_to $first;
+                ();
+            } else { $first = $_ }
+        }
+        else { $_ }
+    } @$fields;
+}
 
 1;
