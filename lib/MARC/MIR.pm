@@ -3,6 +3,7 @@ use parent 'Exporter';
 use autodie;
 use Modern::Perl;
 use Perlude;
+use YAML;
 # use Perlude::Sh qw< :all >;
 
 # ABSTRACT: DSL to manipulate MIR records.
@@ -162,9 +163,12 @@ sub from_iso2709 (_) {
     @fields or die "raw $raw";
     $head =~ /(.{24})/cg or die;
     my $leader = $1;
-    my @tags = $head =~ /\G(\d{3})\d{9}/cg;
-    unless ( $head =~ /\G$/cg ) {
-	die "head tailing ".( $head =~ /(.*)/cg );
+    my @tags = $head =~ /\G(\d{3})[\d ]{9}/cg;
+    if ( $head =~ /\G(.+)$/cg ) {
+        die YAML::Dump
+            { "can't parse head" => $head
+            , "found garbage"    => $1
+            , "at char " => pos($head) };
     }
     [ $leader
     , [ map [ shift(@tags), _field ], @fields ]
