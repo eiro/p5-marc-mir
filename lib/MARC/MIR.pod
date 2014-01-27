@@ -147,6 +147,13 @@ than a more pythonic way
     * Marc Chantreux (eiro) marcc(at)cpan.org
     * You? https://github.com/eiro/p5-marc-mir
 
+=head1 tips
+
+=head2 mired
+
+want a sed for your mir manipulation ? check U<https://github.com/eiro/uze/blob/master/mir>
+
+
 =head1 KNOWN BUGS
 
 feedbacks are very welcome. the only known bugs are
