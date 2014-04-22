@@ -68,7 +68,7 @@ ways to increase my own motivation:
 As a MIR is just an array of array, very simple validations can be written
 using any existing tool which can query/validate a datastructure. I gave 
 [Kwalify](http://www.kuwata-lab.com/kwalify/ruby/users-guide.01.html) a try,
-you can find the [bin/validate](documented source).
+you can find the [eg/validate](documented source).
 
 Although, some other pages deserve further reads and tests:
 
