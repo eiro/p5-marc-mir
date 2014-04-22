@@ -105,7 +105,11 @@ Also i can't expect librarians to do so. that's why we need more tools whom
   (usable from any technology or programming langage)
 * MUST be GUI driven (it would be possible to write rules from a web interface)
 * MAY come with a DSL: intensive users may probably go crazy with web
-  interfaces. S-expr would be perfect to write stuff like
+  interfaces.
+  
+S-expr would be perfect. not only because it will be very easy to implement and
+port but also because it would be a very pleasant to read and edit 
+
 
     (any 200$[abc] (~ "rome|romulus|remus"))
 
