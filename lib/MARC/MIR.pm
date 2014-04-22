@@ -4,6 +4,7 @@ use autodie;
 use Modern::Perl;
 use Perlude;
 use YAML;
+no warnings 'experimental';
 # use Perlude::Sh qw< :all >;
 
 # ABSTRACT: DSL to manipulate MIR records.
