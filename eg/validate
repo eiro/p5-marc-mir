@@ -1,0 +1,75 @@
+#! env perl
+use Eirotic;
+use MARC::MIR;
+use MARC::MIR::Template;
+use Kwalify;
+
+=head1 the big picture
+
+=head2 ISO2709 Record
+
+C<MARC-Records/Unicode/Miserables.mrc> is a ISO2709 serialization
+of the record i dumped using C<bin/dump>: 
+
+    00616cam a2200169 i 4500
+    001 450479
+    005 20020415161518.0
+    008 770928n1862    xx            00000 fre d
+    035(  )  $a (OCoLC)ocm03303913
+    035(  )  $9 ABW-1563
+    040(  )  $a COV $c COV $d m.c. $d UIU $d m.c.3
+    100(10)  $a Hugo, Victor, $d 1802-1885.
+    245(14)  $a Les misérables / $c Victor Hugo.
+    260(0 )  $a Paris : $b Ernest Flammarion, $c [1862?]
+    300(  )  $a 4v. ; $c 19 cm.
+    490(0 )  $a Oeuvres de Victor Hugo
+    505(0 )  $a Pt. 1 . Fantine. Cosette (livres, 1, 2, 3) - Pt. 2. Cosette.
+                - Pt. 3. Marius.- Pt. 4. L'idylle rue Plumet,
+                et L'epopee rue Saint-Denis.- Pt. 5. Jean Valjean.
+
+=head2 MIR Template
+
+a template is a set of rules used by MARC::MIR to extract an intellectual
+datastructure from a MARC record (you can see it as a cataloguing framework).
+
+see C<data/hugo.template.yml> contains rules to get 
+
+      by: Victor Hugo.
+      contributor:
+        - lived: 1802-1885.
+          name: 'Hugo, Victor,'
+      title: Les misérables /
+
+from the ISO2709 (read comments)
+
+=head2 Datastructure Kwalification
+
+see C<data/hugo.kwalify.yml> contains rules to validate any structure.
+
+=cut
+
+my $template =  MARC::MIR::Template->new
+    (YAML::LoadFile "data/hugo.template.yml");
+
+sub validation_errors (_) {
+    state $schema = 
+        (YAML::LoadFile "data/hugo.kwalify.yml")
+            ->{schema};
+
+    state $validator = Kwalify::Validator->new;
+
+    my $data = shift;
+
+    $validator->validate( $schema, $data, '/' );
+    $$validator{errors};
+}
+
+now {
+    my $book =  $template->mir(value from_iso2709);
+
+    say YAML::Dump
+    { book   => $book
+    , errors => validation_errors $book }
+
+} iso2709_records_of "MARC-Records/Unicode/Miserables.mrc";
+
