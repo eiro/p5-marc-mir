@@ -32,7 +32,7 @@ of the record i dumped using C<bin/dump>:
 a template is a set of rules used by MARC::MIR to extract an intellectual
 datastructure from a MARC record (you can see it as a cataloguing framework).
 
-see C<data/hugo.template.yml> contains rules to get 
+see C<eg/data/hugo.template.yml> contains rules to get 
 
       by: Victor Hugo.
       contributor:
@@ -44,16 +44,16 @@ from the ISO2709 (read comments)
 
 =head2 Datastructure Kwalification
 
-see C<data/hugo.kwalify.yml> contains rules to validate any structure.
+see C<eg/data/hugo.kwalify.yml> contains rules to validate any structure.
 
 =cut
 
 my $template =  MARC::MIR::Template->new
-    (YAML::LoadFile "data/hugo.template.yml");
+    (YAML::LoadFile "eg/data/hugo.template.yml");
 
 sub validation_errors (_) {
     state $schema = 
-        (YAML::LoadFile "data/hugo.kwalify.yml")
+        (YAML::LoadFile "eg/data/hugo.kwalify.yml")
             ->{schema};
 
     state $validator = Kwalify::Validator->new;
